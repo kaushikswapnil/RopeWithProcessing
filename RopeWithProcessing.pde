@@ -35,7 +35,7 @@ void setup()
   
   int pendulumCPIndex = numControlPoints - 1;
   float pendulumWeight = 1;
-  //rope.AttachPendulumWeight(pendulumCPIndex, pendulumWeight);  
+  rope.AttachPendulumWeight(pendulumCPIndex, pendulumWeight);  
   
   boundaries = new ArrayList<Boundary>();
   
