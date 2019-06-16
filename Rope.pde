@@ -33,11 +33,10 @@ class Rope
       int numPackedCircles = (int)(m_RopeLength/m_RopeWidth);
       if (numPackedCircles < 1)
       {
-         m_RopeWidth = m_RopeLength;
-         numPackedCircles = 1;
+         m_RopeWidth = 2*m_RopeLength;
       }
 
-      m_NumControlPoints = Math.min(numPackedCircles, m_NumControlPoints);
+      m_NumControlPoints = Math.max(2, Math.min(numPackedCircles, m_NumControlPoints));
       
       Vec2 ropeDirection = initialDir;
       ropeDirection.normalize();
@@ -123,7 +122,14 @@ class Rope
    void ApplyNaturalForces()
    {
      float segmentLength = GetSegmentLength();
-     for (int cpIter = 1; cpIter < m_NumControlPoints; ++cpIter)
+     if (HasAttachedPendulumWeight())
+     {
+       AddTensionForce(m_ControlPoints.get(m_CPIndexWithWeight), m_ControlPoints.get(m_CPIndexWithWeight-1));
+     } 
+     
+     int startingIndex = Math.max(1, m_CPIndexWithWeight);
+     
+     for (int cpIter = startingIndex; cpIter < m_NumControlPoints; ++cpIter)
      {
         //ApplyGravity 
          {
@@ -135,6 +141,8 @@ class Rope
            ApplySpringForces(m_ControlPoints.get(cpIter), m_ControlPoints.get(cpIter - 1), segmentLength);
          }
      }
+     
+
    }
     
    void ApplyGravity(IRopeControlPoint controlPoint)
@@ -147,15 +155,13 @@ class Rope
    void ApplySpringForces(IRopeControlPoint freePoint, IRopeControlPoint attachedPoint, float segmentDistance)
    {
      Vec2 forceOnFreePoint = new Vec2(0, 0);
-     
+
      //Spring Force
      AddSpringForce(freePoint, attachedPoint, segmentDistance, forceOnFreePoint);
 
      //Spring friction
      AddSpringFriction(freePoint, attachedPoint, forceOnFreePoint);
-     
-     //Add necessary tension //<>//
-
+ //<>//
      Vec2 forceOnAttachedPoint = forceOnFreePoint.mul(-1);
      
      freePoint.ApplyForce(forceOnFreePoint);
@@ -187,22 +193,50 @@ class Rope
      
      //Since we will already apply the springFriction again for the next point,
      //we dont need to calculate relative velocity
-     Vec2 attachedPointVelocity = attachedPoint.GetLinearVelocity();
-     Vec2 freePointVelRelToAttached = freePointVelocity.sub(attachedPointVelocity);
-     Vec2 springFriction = freePointVelRelToAttached.mul(-springFrictionConstant);
+     //Vec2 attachedPointVelocity = attachedPoint.GetLinearVelocity();
+     //Vec2 freePointVelRelToAttached = freePointVelocity.sub(attachedPointVelocity);
+     //Vec2 springFriction = freePointVelRelToAttached.mul(-springFrictionConstant);
      
-     //Vec2 springFriction = freePointVelocity.mul(-springFrictionConstant);
+     Vec2 springFriction = freePointVelocity.mul(-springFrictionConstant);
      outForce.addLocal(springFriction);
    }
    
-   void AddTensionForce(IRopeControlPoint pendulumAttachPoint, Vec2 outForce)
+   void AddTensionForce(IRopeControlPoint pendulumAttachPoint, IRopeControlPoint prevPoint)
    {
      IPendulumWeight weight = pendulumAttachPoint.GetAttachedPendulumWeight();
      float mass = weight.GetMass();
      
+     Vec2 banking = new Vec2(0, 1);
+     Vec2 ropeDir = (pendulumAttachPoint.GetPhysicPosition()).sub(m_ControlPoints.get(0).GetPhysicPosition());
+     ropeDir.normalize();
+     
      float Ty = (gravityAcc.mul(mass)).length();
      
-     float Tx = 0;     
+     if (IsGreaterWithEpsilon(Ty, 0.0f))
+     {
+       float cosTheta = Vec2.dot(ropeDir, banking);
+       
+       if (!IsNullWithEpsilon(cosTheta))
+       {
+         float TLength = Ty/abs(cosTheta);
+         Vec2 tensionForce = ropeDir.mul(1);
+         tensionForce.mulLocal(TLength);
+     
+         pendulumAttachPoint.ApplyForce(tensionForce); //<>//
+         //tensionForce.mulLocal(-1);
+
+         for (int iter = 0; iter < m_CPIndexWithWeight; ++iter)
+         {
+           if (iter != m_CPIndexWithWeight)
+           {
+               float tForceLengthAtPt = map(iter, 0, m_CPIndexWithWeight, -TLength, TLength); 
+               Vec2 tForceAtPt = ropeDir.mul(1);
+               tForceAtPt.mulLocal(tForceLengthAtPt);
+               m_ControlPoints.get(iter).ApplyForce(tensionForce); //<>//
+           }
+         }
+       } 
+     }
    }
    
    float GetSegmentLength()
@@ -244,9 +278,9 @@ class Rope
       }
    }
    
-   void AttachedPendulumWeight(int cpIndex, float mass)
+   void AttachPendulumWeight(int cpIndex, float mass)
    {
-      cpIndex = Limit(cpIndex, 0, m_NumControlPoints - 1); 
+      cpIndex = Limit(cpIndex, 1, m_NumControlPoints - 1); 
       
       IRopeControlPoint cp = m_ControlPoints.get(cpIndex);
       PendulumWeightImpl weight = new PendulumWeightImpl(mass, cp);

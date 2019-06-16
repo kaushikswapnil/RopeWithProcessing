@@ -25,14 +25,17 @@ void setup()
   float ropeWidth = 10;
   Vec2 startPos = new Vec2(600, 50);
   
-  int numControlPoints = 10;
-  float ropeMass = 1;
+  int numControlPoints = 6;
+  float ropeMass = 50;
   float springConstant = 1000*(ropeMass/(numControlPoints-1));
-  float springFriction = 0.85;
+  float springFriction = 0.99;
   Vec2 initialDir = new Vec2(1, 0);
   int drawMode = 2;
-  rope = new Rope(ropeLength, ropeWidth, startPos, ropeMass, springConstant, springFriction, numControlPoints, initialDir, drawMode); 
-  //rope.AttachedPendulumWeight(numControlPoints - 1, 15);  
+  rope = new Rope(ropeLength, ropeWidth, startPos, ropeMass, springConstant, springFriction, numControlPoints, initialDir, drawMode);
+  
+  int pendulumCPIndex = numControlPoints - 1;
+  float pendulumWeight = 1;
+  //rope.AttachPendulumWeight(pendulumCPIndex, pendulumWeight);  
   
   boundaries = new ArrayList<Boundary>();
   
