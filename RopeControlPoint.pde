@@ -7,6 +7,8 @@ interface IRopeControlPoint
    Vec2 GetPhysicPosition();
    Vec2 GetLinearVelocity();
    
+   void SetPhysicTransform(Vec2 newPos, float newAng);
+   
    void SetPixelTransform(Vec2 pixelPos, float pixelAng);
    
    void AttachPendulumWeight(IPendulumWeight pendulumWeight);
@@ -91,5 +93,10 @@ class CircleRopeControlPoint implements IRopeControlPoint
   boolean HasAttachedPendulumWeight()
   {
      return m_AttachedPendulumWeight != null; 
+  }
+  
+  void SetPhysicTransform(Vec2 newPos, float newAng)
+  {
+     m_PhysicShape.SetTransform(newPos, -newAng); 
   }
 }
