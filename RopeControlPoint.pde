@@ -8,11 +8,16 @@ interface IRopeControlPoint
    Vec2 GetLinearVelocity();
    
    void SetPixelTransform(Vec2 pixelPos, float pixelAng);
+   
+   void AttachPendulumWeight(IPendulumWeight pendulumWeight);
+   IPendulumWeight GetAttachedPendulumWeight();
+   boolean HasAttachedPendulumWeight();
 }
 
 class CircleRopeControlPoint implements IRopeControlPoint 
 {
   Circle m_PhysicShape;
+  IPendulumWeight m_AttachedPendulumWeight;
   
   CircleRopeControlPoint(float centerX, float centerY, float radius, float cpMass, boolean isStatic)
   {
@@ -29,6 +34,10 @@ class CircleRopeControlPoint implements IRopeControlPoint
   void Display()
   {
     m_PhysicShape.Display();
+    if (HasAttachedPendulumWeight())
+    {
+      m_AttachedPendulumWeight.Display();
+    }
   }
   
   Vec2 GetPixelPosition()
@@ -38,7 +47,14 @@ class CircleRopeControlPoint implements IRopeControlPoint
   
   float GetMass()
   {
-    return m_PhysicShape.GetMass(); 
+    float mass = m_PhysicShape.GetMass();
+    
+    if (HasAttachedPendulumWeight())
+    {
+       mass +=  m_AttachedPendulumWeight.GetMass();
+    }
+    
+    return mass; 
   }
   
   void ApplyForce(Vec2 force)
@@ -60,5 +76,20 @@ class CircleRopeControlPoint implements IRopeControlPoint
   {
    Vec2 pos = GetPhysicWorld().coordPixelsToWorld(pixelPos); 
    m_PhysicShape.SetTransform(pos, -pixelAng); 
+  }
+  
+  void AttachPendulumWeight(IPendulumWeight pendulumWeight)
+  {
+     m_AttachedPendulumWeight = pendulumWeight; 
+  }
+  
+  IPendulumWeight GetAttachedPendulumWeight()
+  {
+     return m_AttachedPendulumWeight; 
+  }
+  
+  boolean HasAttachedPendulumWeight()
+  {
+     return m_AttachedPendulumWeight != null; 
   }
 }

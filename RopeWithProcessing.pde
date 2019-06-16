@@ -26,12 +26,13 @@ void setup()
   Vec2 startPos = new Vec2(600, 50);
   
   int numControlPoints = 10;
-  float ropeMass = 100;
+  float ropeMass = 1;
   float springConstant = 1000*(ropeMass/(numControlPoints-1));
-  float springFriction = 2.0;
+  float springFriction = 0.85;
   Vec2 initialDir = new Vec2(1, 0);
   int drawMode = 2;
   rope = new Rope(ropeLength, ropeWidth, startPos, ropeMass, springConstant, springFriction, numControlPoints, initialDir, drawMode); 
+  //rope.AttachedPendulumWeight(numControlPoints - 1, 15);  
   
   boundaries = new ArrayList<Boundary>();
   
@@ -49,7 +50,8 @@ void draw()
   
   box2d.step();
   
-  rope.Update(0);
+  rope.Update();
+  rope.Display();
   
   for (Boundary boundary : boundaries)
   {
