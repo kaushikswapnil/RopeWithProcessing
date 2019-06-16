@@ -25,7 +25,7 @@ void setup()
   float ropeWidth = 10;
   Vec2 startPos = new Vec2(400, 50);
   
-  int numControlPoints = 10;
+  int numControlPoints = 15;
   float ropeMass = 100;
   float springConstant = 1000*(ropeMass/(numControlPoints-1));
   float springFriction = 0.2;

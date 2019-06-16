@@ -31,7 +31,7 @@ class Rope
 
       m_NumControlPoints = Math.min(numPackedCircles, m_NumControlPoints);
       
-      Vec2 ropeDirection = new Vec2(0, 1);
+      Vec2 ropeDirection = new Vec2(1, 0);
       
       float segmentLength = m_RopeLength/(m_NumControlPoints-1); //This is the pixel segment length
       
