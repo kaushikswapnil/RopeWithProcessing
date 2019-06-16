@@ -28,7 +28,7 @@ void setup()
   int numControlPoints = 10;
   float ropeMass = 100;
   float springConstant = 1000*(ropeMass/(numControlPoints-1));
-  float springFriction = 0.8;
+  float springFriction = 2.0;
   Vec2 initialDir = new Vec2(1, 0);
   int drawMode = 2;
   rope = new Rope(ropeLength, ropeWidth, startPos, ropeMass, springConstant, springFriction, numControlPoints, initialDir, drawMode); 

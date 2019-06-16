@@ -156,11 +156,13 @@ class Rope
 
      //Spring friction
      Vec2 freePointVelocity = freePoint.GetLinearVelocity();
-     Vec2 attachedPointVelocity = attachedPoint.GetLinearVelocity();
+     //Since we will already apply the springFriction again for the next point,
+     //we dont need to calculate relative velocity
+     //Vec2 attachedPointVelocity = attachedPoint.GetLinearVelocity();
+     //Vec2 freePointVelRelToAttached = freePointVelocity.sub(attachedPointVelocity);
+     //Vec2 springFriction = freePointVelRelToAttached.mul(-m_SpringFriction);
      
-     Vec2 freePointVelRelToAttached = freePointVelocity.sub(attachedPointVelocity);
-     
-     Vec2 springFriction = freePointVelRelToAttached.mul(-m_SpringFriction);
+     Vec2 springFriction = freePointVelocity.mul(-m_SpringFriction); //<>//
      
      Vec2 forceOnFreePoint = springForce.add(springFriction);
      Vec2 forceOnAttachedPoint = forceOnFreePoint.mul(-1);
@@ -185,20 +187,17 @@ class Rope
          
          float tInverse = 1-t;
          
-         for (int cpIter = 0; cpIter < m_NumControlPoints; ++cpIter) //<>//
+         for (int cpIter = 0; cpIter < m_NumControlPoints; ++cpIter)
          {
             Vec2 cpPixelPos = m_ControlPoints.get(cpIter).GetPixelPosition();
-           
-            float comb = Combination(curveOrder, cpIter);
-            comb += comb; //<>//
-            comb -= comb;
+
             float pointCoeff = (float)(Combination(curveOrder, cpIter) * (Math.pow(tInverse, curveOrder - cpIter)) * (Math.pow(t, cpIter)));
             pX += pointCoeff * cpPixelPos.x;
             pY += pointCoeff * cpPixelPos.y;
          }
          
          stroke(0, 255, 0, 255);
-         point(pX, pY); //<>//
+         point(pX, pY);
       }
    }
 }
