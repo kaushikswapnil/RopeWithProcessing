@@ -15,30 +15,32 @@ boolean endPointAtMouse = false;
 
 void setup()
 {
-  size(1200, 1200);
+  size(1200, 800);
   
   box2d = new Box2DProcessing(this);
   box2d.createWorld();
   box2d.setGravity(0, 0);
   
-  float ropeLength = 600; 
+  float ropeLength = 500; 
   float ropeWidth = 10;
-  Vec2 startPos = new Vec2(400, 50);
+  Vec2 startPos = new Vec2(600, 50);
   
-  int numControlPoints = 15;
+  int numControlPoints = 10;
   float ropeMass = 100;
   float springConstant = 1000*(ropeMass/(numControlPoints-1));
-  float springFriction = 0.2;
-  rope = new Rope(ropeLength, ropeWidth, startPos, ropeMass, springConstant, springFriction, numControlPoints); 
+  float springFriction = 0.8;
+  Vec2 initialDir = new Vec2(1, 0);
+  int drawMode = 2;
+  rope = new Rope(ropeLength, ropeWidth, startPos, ropeMass, springConstant, springFriction, numControlPoints, initialDir, drawMode); 
   
   boundaries = new ArrayList<Boundary>();
   
-  float boundWidth = 20;
+  float boundWidth = 10;
   float halfBoundWidth = boundWidth/2;
-  //boundaries.add(new Boundary(halfBoundWidth, height/2, boundWidth, height));
-  //boundaries.add(new Boundary(width/2, halfBoundWidth, width, boundWidth));
-  //boundaries.add(new Boundary(width - halfBoundWidth, height/2, boundWidth, height));
-  //boundaries.add(new Boundary(width/2, height - halfBoundWidth, width, boundWidth));
+  boundaries.add(new Boundary(halfBoundWidth, height/2, boundWidth, height));
+  boundaries.add(new Boundary(width/2, halfBoundWidth, width, boundWidth));
+  boundaries.add(new Boundary(width - halfBoundWidth, height/2, boundWidth, height));
+  boundaries.add(new Boundary(width/2, height - halfBoundWidth, width, boundWidth));
 }
 
 void draw()
@@ -55,6 +57,15 @@ void draw()
   }
 }
 
+void keyPressed()
+{
+   if (key == ' ')
+   {
+      int currentDrawMode = rope.m_DrawMode;
+      rope.m_DrawMode = (++currentDrawMode)%3;
+   }
+}
+
 Box2DProcessing GetPhysicWorld()
 {
    return box2d; 
@@ -63,4 +74,54 @@ Box2DProcessing GetPhysicWorld()
 float ConvertScalarPixelsToPhysicWorldUnit(float value)
 {
    return box2d.scalarPixelsToWorld(value); 
+}
+
+int Combination(int n, int i) //nCi
+{
+  return Factorial(n)/(Factorial(i) * Factorial(n-i));
+}
+
+int Factorial(int n)
+{
+   int answer = 1;
+   for (int i = 1; i <= n; ++i)
+   {
+      answer *= i; 
+   }
+   
+   return answer; 
+}
+
+boolean IsNullWithEpsilon(float value)
+{
+  return abs(value - 0.0) <= EPSILON;
+}
+
+boolean IsGreaterWithEpsilon(float a, float b)
+{
+  return (a - b) > EPSILON;
+}
+
+boolean IsLesserWithEpsilon(float a, float b)
+{
+  return (a - b) < EPSILON;
+}
+
+boolean IsEqualWithEpsilon(float a, float b)
+{
+  return IsNullWithEpsilon(a-b); 
+}
+
+boolean IsGreaterOrEqualWithEpsilon(float a, float b)
+{
+   return IsGreaterWithEpsilon(a, b) || IsEqualWithEpsilon(a, b); 
+}
+
+boolean IsLesserOrEqualWithEpsilon(float a, float b)
+{
+   return IsLesserWithEpsilon(a, b) || IsEqualWithEpsilon(a, b); 
+}
+
+int Limit(int value, int minValue, int maxValue) {
+    return Math.max(minValue, Math.min(value, maxValue));
 }

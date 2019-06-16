@@ -8,8 +8,10 @@ class Rope
    float m_RopeMass;
    float m_SpringConstant;
    float m_SpringFriction;
+
+   int m_DrawMode; //0 = draw bezier and rope 1 = draw rope control points 2 = draw bezier
    
-   Rope(float ropeLength, float ropeWidth, Vec2 startPos, float ropeMass, float springConstant, float springFriction, int numControlPoints)
+   Rope(float ropeLength, float ropeWidth, Vec2 startPos, float ropeMass, float springConstant, float springFriction, int numControlPoints, Vec2 initialDir, int drawMode)
    {
       m_ControlPoints = new ArrayList<IRopeControlPoint>();
       
@@ -22,6 +24,8 @@ class Rope
       
       m_NumControlPoints = numControlPoints;
       
+      m_DrawMode = Limit(drawMode, 0, 2);
+      
       int numPackedCircles = (int)(m_RopeLength/m_RopeWidth);
       if (numPackedCircles < 1)
       {
@@ -31,7 +35,8 @@ class Rope
 
       m_NumControlPoints = Math.min(numPackedCircles, m_NumControlPoints);
       
-      Vec2 ropeDirection = new Vec2(1, 0);
+      Vec2 ropeDirection = initialDir;
+      ropeDirection.normalize();
       
       float segmentLength = m_RopeLength/(m_NumControlPoints-1); //This is the pixel segment length
       
@@ -48,7 +53,7 @@ class Rope
       }
    }
    
-   void Display()
+   void DisplayRopeControlPoints()
    {
       Vec2 prevPos = m_ControlPoints.get(0).GetPixelPosition();
       
@@ -66,6 +71,25 @@ class Rope
         controlPoint.Display();
         prevPos = curPos;
       }
+   }
+   
+   void Display()
+   {
+     switch(m_DrawMode)
+     {
+        case 0:
+        DisplayRopeControlPoints();
+        DrawBezier();
+        break;
+        
+        case 1:
+        DisplayRopeControlPoints();
+        break;
+        
+        case 2:
+        DrawBezier();
+        break;
+     }
    }
    
    void Update(float dt)
@@ -112,7 +136,7 @@ class Rope
    {
      Vec2 gravity = gravityAcc.mul(controlPoint.GetMass());
      
-     controlPoint.ApplyForce(gravity); //<>//
+     controlPoint.ApplyForce(gravity);
    }
    
    void ApplySpringForces(IRopeControlPoint freePoint, IRopeControlPoint attachedPoint, float segmentDistance)
@@ -142,11 +166,39 @@ class Rope
      Vec2 forceOnAttachedPoint = forceOnFreePoint.mul(-1);
      
      freePoint.ApplyForce(forceOnFreePoint);
-     attachedPoint.ApplyForce(forceOnAttachedPoint); //<>//
+     attachedPoint.ApplyForce(forceOnAttachedPoint);
    }
    
    float GetSegmentLength()
    {
      return ConvertScalarPixelsToPhysicWorldUnit(m_RopeLength)/(m_NumControlPoints-1); 
+   }
+   
+   void DrawBezier()
+   {
+      int curveOrder = m_NumControlPoints - 1;
+      
+      for (float t = 0; IsLesserOrEqualWithEpsilon(t, 1.0f); t += 0.001f)
+      {
+         float pX = 0;
+         float pY = 0;
+         
+         float tInverse = 1-t;
+         
+         for (int cpIter = 0; cpIter < m_NumControlPoints; ++cpIter) //<>//
+         {
+            Vec2 cpPixelPos = m_ControlPoints.get(cpIter).GetPixelPosition();
+           
+            float comb = Combination(curveOrder, cpIter);
+            comb += comb; //<>//
+            comb -= comb;
+            float pointCoeff = (float)(Combination(curveOrder, cpIter) * (Math.pow(tInverse, curveOrder - cpIter)) * (Math.pow(t, cpIter)));
+            pX += pointCoeff * cpPixelPos.x;
+            pY += pointCoeff * cpPixelPos.y;
+         }
+         
+         stroke(0, 255, 0, 255);
+         point(pX, pY); //<>//
+      }
    }
 }
