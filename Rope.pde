@@ -54,8 +54,7 @@ class Rope
       for (int iter = 1; iter < m_NumControlPoints; ++iter)
       {
         curPos.addLocal(posIncrement);
-        m_ControlPoints.add(new CircleRopeControlPoint(curPos.x, curPos.y, m_RopeWidth/2, cpMass, false)); 
-         
+        m_ControlPoints.add(new CircleRopeControlPoint(curPos.x, curPos.y, m_RopeWidth/2, cpMass, false));   
       }
    }
    
@@ -160,20 +159,20 @@ class Rope
       Vec2 gravityForce = gravityAcc.mul(massOfRopeUnderTension);
       m_ControlPoints.get(m_CPIndexWithWeight).ApplyForce(gravityForce);
      
-      IRopeControlPoint freePoint = m_ControlPoints.get(m_CPIndexWithWeight);
+      IRopeControlPoint weightedPoint = m_ControlPoints.get(m_CPIndexWithWeight);
       IRopeControlPoint startPoint = m_ControlPoints.get(0);
       
       Vec2 forceOnFreePoint = new Vec2(0, 0);
       
-      AddSpringForce(freePoint, startPoint, segmentLength*m_CPIndexWithWeight, m_SpringConstants[1], forceOnFreePoint);
+      AddSpringForce(weightedPoint, startPoint, segmentLength*m_CPIndexWithWeight, m_SpringConstants[1], forceOnFreePoint);
       
-      AddSpringFriction(freePoint, startPoint, forceOnFreePoint);
+      AddSpringFriction(weightedPoint, startPoint, forceOnFreePoint);
       
       Vec2 newCPPos = startPoint.GetPhysicPosition().mul(1);
-      Vec2 ropeDir = (freePoint.GetPhysicPosition()).sub(newCPPos);
+      Vec2 ropeDir = (weightedPoint.GetPhysicPosition()).sub(newCPPos);
       ropeDir.normalize();
       
-      freePoint.ApplyForce(forceOnFreePoint);
+      weightedPoint.ApplyForce(forceOnFreePoint);
       
       Vec2 posIncrement = ropeDir.mul(segmentLength);
       for (int tCPiter = 1; tCPiter < m_CPIndexWithWeight; ++tCPiter)
