@@ -201,6 +201,12 @@ class Rope
  //<>//
      Vec2 forceOnAttachedPoint = forceOnFreePoint.mul(-1);
      
+     //Vec2 textPos = new Vec2(freePoint.GetPixelPosition().x, freePoint.GetPixelPosition().y + 10);
+     
+     //float forceLength = forceOnFreePoint.length();
+     //Vec2 debugForce = GetPhysicWorld().vectorWorldToPixels(forceOnFreePoint);
+     //debugDisplay.DrawArrow(textPos, debugForce, forceLength);
+     
      freePoint.ApplyForce(forceOnFreePoint);
      attachedPoint.ApplyForce(forceOnAttachedPoint);
    }

@@ -15,6 +15,8 @@ boolean endPointAtMouse = false;
 
 float pendulumWeight = 5.0;
 
+DebugDisplay debugDisplay = new DebugDisplay();
+
 void setup()
 {
   size(1200, 800);
