@@ -13,7 +13,7 @@ Vec2 gravityAcc = new Vec2(0, -10);
 
 boolean endPointAtMouse = false;
 
-float pendulumWeight = 0.1;
+float pendulumWeight = 5.0;
 
 void setup()
 {
@@ -28,7 +28,7 @@ void setup()
   Vec2 startPos = new Vec2(600, 50);
   
   int numControlPoints = 6;
-  float ropeMass = 10;
+  float ropeMass = 100;
   float springConstant = 1000*(ropeMass/(numControlPoints-1));
   float springFriction = 0.99;
   Vec2 initialDir = new Vec2(1, 0);
