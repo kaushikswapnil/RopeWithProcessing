@@ -9,7 +9,7 @@ class Rope
    float[] m_SpringConstants; //The first one is for free rope and second for tight rope 
    float m_SpringFrictionCoeff;
 
-   int m_DrawMode; //0 = draw bezier and rope 1 = draw rope control points 2 = draw bezier
+   int m_DrawMode; //0 = draw bezier and rope 1 = draw rope control points 2 = draw bezier, 3 = drawDebugMode
    
    int m_CPIndexWithWeight; //-1 if there is no weight, or index value if present
 
@@ -29,9 +29,9 @@ class Rope
       m_SpringConstants[1] = 0;
       m_SpringFrictionCoeff = springFrictionCoeff;
       
-      m_NumControlPoints = numControlPoints;
+      m_DrawMode = drawMode;
       
-      m_DrawMode = Limit(drawMode, 0, 2);
+      m_NumControlPoints = numControlPoints;
       
       int numPackedCircles = (int)(m_RopeLength/m_RopeWidth);
       if (numPackedCircles < 1)
@@ -82,6 +82,7 @@ class Rope
    {
      switch(m_DrawMode)
      {
+        case 3:
         case 0:
         DisplayRopeControlPoints();
         DrawBezierRope();
@@ -158,6 +159,17 @@ class Rope
      
       Vec2 gravityForce = gravityAcc.mul(massOfRopeUnderTension);
       m_ControlPoints.get(m_CPIndexWithWeight).ApplyForce(gravityForce);
+      
+      if (m_DrawMode == 3)//Debug mode
+      {
+         float forceLength = GetPhysicWorld().scalarWorldToPixels(gravityForce.length());
+       
+         Vec2 textPos = new Vec2(m_ControlPoints.get(m_CPIndexWithWeight).GetPixelPosition().x, m_ControlPoints.get(m_CPIndexWithWeight).GetPixelPosition().y + 40);
+         debugDisplay.PrintString(textPos, Float.toString(forceLength), 1, DebugColors.RED);
+         
+         Vec2 debugForce = GetPhysicWorld().vectorWorldToPixels(gravityForce);
+         debugDisplay.DrawArrow(textPos, debugForce, massOfRopeUnderTension*10, DebugColors.RED );
+      }
      
       IRopeControlPoint weightedPoint = m_ControlPoints.get(m_CPIndexWithWeight);
       IRopeControlPoint startPoint = m_ControlPoints.get(0);
@@ -174,6 +186,17 @@ class Rope
       
       weightedPoint.ApplyForce(forceOnFreePoint);
       
+      if (m_DrawMode == 3)//Debug mode
+      {
+         float forceLength = GetPhysicWorld().scalarWorldToPixels(forceOnFreePoint.length());
+       
+         Vec2 textPos = new Vec2(weightedPoint.GetPixelPosition().x, weightedPoint.GetPixelPosition().y + 10);
+         debugDisplay.PrintString(textPos, Float.toString(forceLength), 1, DebugColors.BLUE);
+         
+         Vec2 debugForce = GetPhysicWorld().vectorWorldToPixels(forceOnFreePoint);
+         debugDisplay.DrawArrow(textPos, debugForce, GetPhysicWorld().scalarWorldToPixels(segmentLength*m_CPIndexWithWeight), DebugColors.BLUE );
+      }
+      
       Vec2 posIncrement = ropeDir.mul(segmentLength);
       for (int tCPiter = 1; tCPiter < m_CPIndexWithWeight; ++tCPiter)
       {
@@ -185,6 +208,17 @@ class Rope
    void ApplyGravityOnFreePoint(IRopeControlPoint controlPoint)
    {
      Vec2 gravity = gravityAcc.mul(controlPoint.GetMass());
+     
+     if (m_DrawMode == 3)//Debug mode
+     {
+         float forceLength = GetPhysicWorld().scalarWorldToPixels(gravity.length());
+       
+         Vec2 textPos = new Vec2(controlPoint.GetPixelPosition().x, controlPoint.GetPixelPosition().y + 40);
+         debugDisplay.PrintString(textPos, Float.toString(forceLength), 1, DebugColors.RED);
+         
+         Vec2 debugForce = GetPhysicWorld().vectorWorldToPixels(gravity);
+         debugDisplay.DrawArrow(textPos, debugForce, controlPoint.GetMass()*10, DebugColors.RED );
+     }
      
      controlPoint.ApplyForce(gravity);
    }
@@ -201,11 +235,16 @@ class Rope
  //<>//
      Vec2 forceOnAttachedPoint = forceOnFreePoint.mul(-1);
      
-     //Vec2 textPos = new Vec2(freePoint.GetPixelPosition().x, freePoint.GetPixelPosition().y + 10);
+     if (m_DrawMode == 3)//Debug mode
+     {
+       float forceLength = GetPhysicWorld().scalarWorldToPixels(forceOnAttachedPoint.length());
      
-     //float forceLength = forceOnFreePoint.length();
-     //Vec2 debugForce = GetPhysicWorld().vectorWorldToPixels(forceOnFreePoint);
-     //debugDisplay.DrawArrow(textPos, debugForce, forceLength);
+       Vec2 textPos = new Vec2(freePoint.GetPixelPosition().x, freePoint.GetPixelPosition().y + 10);
+       debugDisplay.PrintString(textPos, Float.toString(forceLength), 1, DebugColors.BLUE);
+       
+       Vec2 debugForce = GetPhysicWorld().vectorWorldToPixels(forceOnFreePoint);
+       debugDisplay.DrawArrow(textPos, debugForce, GetPhysicWorld().scalarWorldToPixels(segmentDistance), DebugColors.BLUE );
+     }
      
      freePoint.ApplyForce(forceOnFreePoint);
      attachedPoint.ApplyForce(forceOnAttachedPoint);

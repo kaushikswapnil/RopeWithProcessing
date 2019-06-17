@@ -29,12 +29,12 @@ void setup()
   float ropeWidth = 10;
   Vec2 startPos = new Vec2(600, 50);
   
-  int numControlPoints = 6;
-  float ropeMass = 100;
+  int numControlPoints = 8;
+  float ropeMass = 50;
   float springConstant = 1000*(ropeMass/(numControlPoints-1));
   float springFriction = 0.99;
   Vec2 initialDir = new Vec2(1, 0);
-  int drawMode = 0;
+  int drawMode = 3;
   rope = new Rope(ropeLength, ropeWidth, startPos, ropeMass, springConstant, springFriction, numControlPoints, initialDir, drawMode);
   
   int pendulumCPIndex = numControlPoints - 4;
@@ -72,7 +72,7 @@ void keyPressed()
    if (key == ' ')
    {
       int currentDrawMode = rope.m_DrawMode;
-      rope.m_DrawMode = (++currentDrawMode)%3;
+      rope.m_DrawMode = (++currentDrawMode)%4;
    }
    else if(key == 'a' || key == 'A')
    {

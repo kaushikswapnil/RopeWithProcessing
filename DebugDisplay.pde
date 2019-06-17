@@ -9,23 +9,27 @@ enum DebugColors
 
 class DebugDisplay
 { 
+  void DrawLine(float startPosX, float startPosY, float endPosX, float endPosY, DebugColors colorVal)
+  {
+   pushMatrix();
+   SetStrokeColor(colorVal);
+   line (startPosX, startPosY, endPosX, endPosY);
+   popMatrix();
+  }
+  
   void DrawLine(Vec2 pos, Vec2 dir, float length, DebugColors colorVal)
   {
      dir.normalize();
      dir.mulLocal(length);
      
-     pushMatrix();
-     SetStrokeColor(colorVal);
-     line (pos.x, pos.y, pos.x + dir.x, pos.y + dir.y);
-     popMatrix();
+     Vec2 endPos = dir.add(pos);
+     
+     DrawLine(pos.x, pos.y, endPos.x, endPos.y, colorVal);
   }
   
   void DrawLine(Vec2 startPos, Vec2 endPos, DebugColors colorVal)
   {
-     pushMatrix();
-     SetStrokeColor(colorVal);
-     line (startPos.x, startPos.y, endPos.x, endPos.y);
-     popMatrix(); 
+     DrawLine(startPos.x, startPos.y, endPos.x, endPos.y, colorVal);
   }
   
   void DrawArrow(float posX, float posY, float dirX, float dirY, float length, DebugColors colorVal)
@@ -59,10 +63,15 @@ class DebugDisplay
   
   void PrintString(Vec2 pos, String text, int textScale, DebugColors colorVal)
   {
+     PrintString(pos.x, pos.y, text, textScale, colorVal);
+  }
+  
+  void PrintString(float posX, float posY, String text, int textScale, DebugColors colorVal)
+  {
      pushMatrix();
      SetFillColor(colorVal);
      textSize(textScale*15);
-     text(text, pos.x, pos.y); 
+     text(text, posX, posY); 
      popMatrix();
   }
   
