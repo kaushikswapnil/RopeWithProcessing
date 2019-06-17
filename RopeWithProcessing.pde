@@ -13,6 +13,8 @@ Vec2 gravityAcc = new Vec2(0, -10);
 
 boolean endPointAtMouse = false;
 
+float pendulumWeight = 0.1;
+
 void setup()
 {
   size(1200, 800);
@@ -25,16 +27,15 @@ void setup()
   float ropeWidth = 10;
   Vec2 startPos = new Vec2(600, 50);
   
-  int numControlPoints = 8;
-  float ropeMass = 20;
+  int numControlPoints = 6;
+  float ropeMass = 10;
   float springConstant = 1000*(ropeMass/(numControlPoints-1));
   float springFriction = 0.99;
   Vec2 initialDir = new Vec2(1, 0);
   int drawMode = 0;
   rope = new Rope(ropeLength, ropeWidth, startPos, ropeMass, springConstant, springFriction, numControlPoints, initialDir, drawMode);
   
-  int pendulumCPIndex = numControlPoints - 1 - 4;
-  float pendulumWeight = 0.1;
+  int pendulumCPIndex = numControlPoints - 4;
   rope.AttachPendulumWeight(pendulumCPIndex, pendulumWeight);  
   
   boundaries = new ArrayList<Boundary>();
@@ -71,6 +72,39 @@ void keyPressed()
       int currentDrawMode = rope.m_DrawMode;
       rope.m_DrawMode = (++currentDrawMode)%3;
    }
+   else if(key == 'a' || key == 'A')
+   {
+      rope.AttachPendulumWeight(rope.m_NumControlPoints-1, pendulumWeight); 
+   }
+   else if (key == 'd' || key == 'D')
+   {
+      rope.DetachPendulumWeight(); 
+   }
+   else if (rope.HasAttachedPendulumWeight())
+   {
+      int weightedIndex = rope.m_CPIndexWithWeight;
+      if (key == 'w' || key == 'W')
+      {
+          --weightedIndex; 
+          weightedIndex = Math.min(Math.max(1, weightedIndex), rope.m_NumControlPoints-1);
+          
+          rope.DetachPendulumWeight();
+          rope.AttachPendulumWeight(weightedIndex, pendulumWeight);
+      }
+      else if (key == 's' || key == 'S')
+      {
+          ++weightedIndex;
+          
+          weightedIndex = Math.min(Math.max(1, weightedIndex), rope.m_NumControlPoints-1);
+          
+          rope.DetachPendulumWeight();
+          rope.AttachPendulumWeight(weightedIndex, pendulumWeight);
+      }
+      else if (key == 'p' || key == 'p')
+      {
+          //rope.ApplyPushForceOnPendulum(); 
+      }
+   }  //<>// //<>// //<>//
 }
 
 Box2DProcessing GetPhysicWorld()

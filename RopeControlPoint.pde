@@ -12,6 +12,7 @@ interface IRopeControlPoint
    void SetPixelTransform(Vec2 pixelPos, float pixelAng);
    
    void AttachPendulumWeight(IPendulumWeight pendulumWeight);
+   void DetachPendulumWeight();
    IPendulumWeight GetAttachedPendulumWeight();
    boolean HasAttachedPendulumWeight();
 }
@@ -83,6 +84,11 @@ class CircleRopeControlPoint implements IRopeControlPoint
   void AttachPendulumWeight(IPendulumWeight pendulumWeight)
   {
      m_AttachedPendulumWeight = pendulumWeight; 
+  }
+  
+  void DetachPendulumWeight()
+  {
+     m_AttachedPendulumWeight = null; 
   }
   
   IPendulumWeight GetAttachedPendulumWeight()
