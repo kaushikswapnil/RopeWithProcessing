@@ -4,7 +4,9 @@ enum DebugColors
   GREEN,
   BLUE,
   YELLOW,
-  WHITE
+  WHITE,
+  PINK,
+  BLACK,
 }
 
 class DebugDisplay
@@ -114,6 +116,18 @@ class DebugDisplay
        case YELLOW:
        rgbColors[0] = 255;
        rgbColors[1] = 255;
+       rgbColors[2] = 0;
+       break;
+       
+       case PINK:
+       rgbColors[0] = 255;
+       rgbColors[1] = 51;
+       rgbColors[2] = 255;
+       break;
+       
+       case BLACK:
+       rgbColors[0] = 0;
+       rgbColors[1] = 0;
        rgbColors[2] = 0;
        break;
        

@@ -13,7 +13,7 @@ Vec2 gravityAcc = new Vec2(0, -10);
 
 boolean endPointAtMouse = false;
 
-float pendulumWeight = 5.0;
+float pendulumWeight = 8.0;
 
 DebugDisplay debugDisplay = new DebugDisplay();
 
@@ -30,11 +30,11 @@ void setup()
   Vec2 startPos = new Vec2(600, 50);
   
   int numControlPoints = 8;
-  float ropeMass = 50;
-  float springConstant = 1000*(ropeMass/(numControlPoints-1));
+  float ropeMass = 3.0;
+  float springConstant = 100*(ropeMass/(numControlPoints-1));
   float springFriction = 0.99;
   Vec2 initialDir = new Vec2(1, 0);
-  int drawMode = 3;
+  int drawMode = 2;
   rope = new Rope(ropeLength, ropeWidth, startPos, ropeMass, springConstant, springFriction, numControlPoints, initialDir, drawMode);
   
   int pendulumCPIndex = numControlPoints - 4;
@@ -49,7 +49,7 @@ void setup()
   boundaries.add(new Boundary(width - halfBoundWidth, height/2, boundWidth, height));
   boundaries.add(new Boundary(width/2, height - halfBoundWidth, width, boundWidth));
   
-  //frameRate(5);
+  //frameRate( 120);
 }
 
 void draw()

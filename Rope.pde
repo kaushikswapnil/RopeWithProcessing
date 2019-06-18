@@ -56,6 +56,8 @@ class Rope
         curPos.addLocal(posIncrement);
         m_ControlPoints.add(new CircleRopeControlPoint(curPos.x, curPos.y, m_RopeWidth/2, cpMass, false));   
       }
+      //curPos.addLocal(posIncrement);
+      //m_ControlPoints.add(new CircleRopeControlPoint(curPos.x, curPos.y, m_RopeWidth/2, cpMass*, false));   
    }
    
    void DisplayRopeControlPoints()
@@ -158,6 +160,7 @@ class Rope
       massOfRopeUnderTension += m_ControlPoints.get(m_CPIndexWithWeight).GetAttachedPendulumWeight().GetMass();
      
       Vec2 gravityForce = gravityAcc.mul(massOfRopeUnderTension);
+      
       m_ControlPoints.get(m_CPIndexWithWeight).ApplyForce(gravityForce);
       
       if (m_DrawMode == 3)//Debug mode
@@ -183,7 +186,7 @@ class Rope
       Vec2 newCPPos = startPoint.GetPhysicPosition().mul(1);
       Vec2 ropeDir = (weightedPoint.GetPhysicPosition()).sub(newCPPos);
       ropeDir.normalize();
-      
+
       weightedPoint.ApplyForce(forceOnFreePoint);
       
       if (m_DrawMode == 3)//Debug mode
@@ -348,7 +351,7 @@ class Rope
       cpMass = cpMass*m_CPIndexWithWeight;
       cpMass += mass;
       
-      m_SpringConstants[1] = 1000*cpMass;
+      m_SpringConstants[1] = 100*cpMass;
    }
    
    void DetachPendulumWeight()
